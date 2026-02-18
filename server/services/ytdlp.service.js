@@ -14,11 +14,24 @@ function execPromise(command) {
   });
 }
 
+// Get platform-specific yt-dlp flags
+function getPlatformFlags(url) {
+  const flags = [];
+  if (/twitter\.com|x\.com/i.test(url)) {
+    // Use guest token API for Twitter/X (no auth needed)
+    flags.push('--extractor-args', '"twitter:api=graphql"');
+    flags.push('--user-agent', '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"');
+  }
+  return flags.join(' ');
+}
+
 async function getInfo(url) {
   console.log('[yt-dlp] Fetching info for:', url);
 
   try {
-    const command = `yt-dlp --dump-json --no-playlist "${url}"`;
+    const platformFlags = getPlatformFlags(url);
+    const command = `yt-dlp --dump-json --no-playlist ${platformFlags} "${url}"`;
+    console.log('[yt-dlp] Command:', command);
     const stdout = await execPromise(command);
     const rawInfo = JSON.parse(stdout);
 
@@ -122,8 +135,9 @@ async function downloadMedia(url, formatId, quality, outputDir) {
   }
 
   const outputTemplate = path.join(outputDir, `${filename}.%(ext)s`);
+  const platformFlags = getPlatformFlags(url);
 
-  const command = `yt-dlp ${formatArg} --no-playlist -o "${outputTemplate}" "${url}"`;
+  const command = `yt-dlp ${formatArg} --no-playlist ${platformFlags} -o "${outputTemplate}" "${url}"`;
 
   console.log('[yt-dlp] Running command:', command);
 

@@ -16,11 +16,12 @@ function execPromise(command) {
 
 // Get platform-specific yt-dlp flags
 function getPlatformFlags(url) {
-  const flags = [];
-  if (/twitter\.com|x\.com/i.test(url)) {
-    // Use guest token API for Twitter/X (no auth needed)
-    flags.push('--extractor-args', '"twitter:api=graphql"');
-    flags.push('--user-agent', '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"');
+  const flags = [
+    '--no-check-certificates',
+    '--user-agent', '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"',
+  ];
+  if (/tiktok\.com/i.test(url)) {
+    flags.push('--extractor-args', '"tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com"');
   }
   return flags.join(' ');
 }

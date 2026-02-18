@@ -24,13 +24,20 @@ if (!fs.existsSync(TMP_DIR)) {
 }
 
 // CORS configuration
+const allowedOrigins = ALLOWED_ORIGIN === '*'
+  ? true
+  : [ALLOWED_ORIGIN, 'http://localhost:3000'];
+
 app.use(
   cors({
-    origin: [ALLOWED_ORIGIN, 'http://localhost:3000'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true,
   })
 );
+
+// Trust proxy (Railway, Vercel, etc. run behind reverse proxies)
+app.set('trust proxy', 1);
 
 // Rate limiting: max 20 requests per 15 minutes per IP
 const limiter = rateLimit({

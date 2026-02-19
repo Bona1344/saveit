@@ -40,7 +40,7 @@ app.use(
 // Trust proxy (Railway, Vercel, etc. run behind reverse proxies)
 app.set('trust proxy', 1);
 
-// Rate limiting: only applied to info & download endpoints (NOT status/file)
+// Rate limiting: only on info & download endpoints
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,
@@ -54,12 +54,12 @@ const limiter = rateLimit({
 // Parse JSON bodies
 app.use(express.json());
 
-// Mount routes — rate limit only on info and download, NOT on status or file
+// Mount routes — rate limit only on info and download
 app.use('/api/info', limiter, infoRouter);
 app.use('/api/download', limiter, downloadRouter);
 app.use('/api/status', statusRouter);
 
-// Serve files from the /api/file route (NO rate limiting)
+// Serve files with proper streaming (NO rate limiting)
 app.get('/api/file/:filename', (req, res) => {
   const { filename } = req.params;
   const sanitized = path.basename(filename);
@@ -71,14 +71,40 @@ app.get('/api/file/:filename', (req, res) => {
     return res.status(404).json({ error: 'File not found.' });
   }
 
-  res.download(filePath, sanitized, (err) => {
-    if (err) {
-      console.error('[Server] Error sending file:', err.message);
+  try {
+    const stat = fs.statSync(filePath);
+    const ext = path.extname(sanitized).toLowerCase();
+
+    // Set proper headers for fast streaming
+    const mimeTypes = {
+      '.mp4': 'video/mp4',
+      '.mp3': 'audio/mpeg',
+      '.webm': 'video/webm',
+      '.mkv': 'video/x-matroska',
+      '.m4a': 'audio/mp4',
+    };
+
+    res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Content-Disposition', `attachment; filename="${sanitized}"`);
+    res.setHeader('Cache-Control', 'no-cache');
+
+    // Stream the file directly
+    const stream = fs.createReadStream(filePath);
+    stream.pipe(res);
+
+    stream.on('error', (err) => {
+      console.error('[Server] Stream error:', err.message);
       if (!res.headersSent) {
         res.status(500).json({ error: 'Failed to download file.' });
       }
+    });
+  } catch (err) {
+    console.error('[Server] File serve error:', err.message);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to serve file.' });
     }
-  });
+  }
 });
 
 // Health check endpoint
@@ -107,7 +133,6 @@ app.listen(PORT, () => {
     console.log('[Server] Download worker initialized.');
   } catch (err) {
     console.error('[Server] Failed to initialize worker:', err.message);
-    console.error('[Server] Make sure Redis is running on localhost:6379');
   }
 
   // Start cleanup job

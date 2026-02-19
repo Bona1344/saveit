@@ -1,12 +1,13 @@
 const { exec } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { getCookiesPath } = require('../utils/cookies');
 const { getPlatform } = require('../utils/validator');
 
 function execPromise(command, timeoutMs = 300000) {
   return new Promise((resolve, reject) => {
-    exec(command, { maxBuffer: 1024 * 1024 * 50, timeout: timeoutMs }, (error, stdout, stderr) => {
+    const proc = exec(command, { maxBuffer: 1024 * 1024 * 50, timeout: timeoutMs }, (error, stdout, stderr) => {
       if (stderr) {
         console.log('[yt-dlp] stderr:', stderr.slice(0, 500));
       }
@@ -37,6 +38,16 @@ function getPlatformFlags(url) {
   return flags.join(' ');
 }
 
+// Speed optimization flags for yt-dlp
+function getSpeedFlags() {
+  return [
+    '--concurrent-fragments', '4',
+    '--no-part',
+    '--buffer-size', '16K',
+    '--no-warnings',
+  ].join(' ');
+}
+
 async function getInfo(url) {
   console.log('[yt-dlp] Fetching info for:', url);
 
@@ -44,7 +55,7 @@ async function getInfo(url) {
     const platformFlags = getPlatformFlags(url);
     const command = `yt-dlp --dump-json --no-playlist ${platformFlags} "${url}"`;
     console.log('[yt-dlp] Command:', command);
-    const stdout = await execPromise(command);
+    const stdout = await execPromise(command, 60000);
     const rawInfo = JSON.parse(stdout);
 
     console.log('[yt-dlp] Got info:', rawInfo.title);
@@ -134,30 +145,29 @@ async function downloadMedia(url, formatId, quality, outputDir) {
   console.log('[yt-dlp] Starting download:', { url, formatId, quality });
 
   const filename = `${uuidv4()}`;
-  let ext = 'mp4';
   let formatArg = '';
 
   if (quality === 'audio-only' || formatId === 'audio-only') {
     formatArg = '-f bestaudio --extract-audio --audio-format mp3';
-    ext = 'mp3';
   } else if (!formatId || formatId === 'best') {
-    formatArg = '-f bestvideo+bestaudio/best --merge-output-format mp4';
+    // Prefer pre-merged format (b) to avoid slow FFmpeg merge on server
+    formatArg = '-f "bv*+ba/b/best" --merge-output-format mp4';
   } else {
-    formatArg = `-f ${formatId}+bestaudio/best --merge-output-format mp4`;
+    formatArg = `-f "${formatId}+ba/b/best" --merge-output-format mp4`;
   }
 
   const outputTemplate = path.join(outputDir, `${filename}.%(ext)s`);
   const platformFlags = getPlatformFlags(url);
+  const speedFlags = getSpeedFlags();
 
-  const command = `yt-dlp ${formatArg} --no-playlist ${platformFlags} -o "${outputTemplate}" "${url}"`;
+  const command = `yt-dlp ${formatArg} --no-playlist ${speedFlags} ${platformFlags} -o "${outputTemplate}" "${url}"`;
 
   console.log('[yt-dlp] Running command:', command);
 
   try {
-    await execPromise(command);
+    await execPromise(command, 300000);
 
-    // Find the actual output file (yt-dlp may change extension)
-    const fs = require('fs');
+    // Find the actual output file
     const files = fs.readdirSync(outputDir);
     const outputFile = files.find((f) => f.startsWith(filename));
 

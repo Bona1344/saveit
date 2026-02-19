@@ -11,6 +11,7 @@ const downloadRouter = require('./routes/download');
 const statusRouter = require('./routes/status');
 const { setupWorker } = require('./services/queue.service');
 const { startCleanupJob } = require('./utils/cleanup');
+const { initCookies } = require('./utils/cookies');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -39,27 +40,26 @@ app.use(
 // Trust proxy (Railway, Vercel, etc. run behind reverse proxies)
 app.set('trust proxy', 1);
 
-// Rate limiting: max 20 requests per 15 minutes per IP
+// Rate limiting: only applied to info & download endpoints (NOT status/file)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     error: 'Too many requests. Please try again in a few minutes.',
   },
 });
-app.use(limiter);
 
 // Parse JSON bodies
 app.use(express.json());
 
-// Mount routes
-app.use('/api/info', infoRouter);
-app.use('/api/download', downloadRouter);
+// Mount routes — rate limit only on info and download, NOT on status or file
+app.use('/api/info', limiter, infoRouter);
+app.use('/api/download', limiter, downloadRouter);
 app.use('/api/status', statusRouter);
 
-// Serve files from the /api/file route
+// Serve files from the /api/file route (NO rate limiting)
 app.get('/api/file/:filename', (req, res) => {
   const { filename } = req.params;
   const sanitized = path.basename(filename);
@@ -97,6 +97,9 @@ app.listen(PORT, () => {
   console.log(`[Server] SaveIt backend running on http://localhost:${PORT}`);
   console.log(`[Server] Allowed origin: ${ALLOWED_ORIGIN}`);
   console.log(`[Server] Tmp directory: ${TMP_DIR}`);
+
+  // Initialize cookies for Twitter/X and Threads
+  initCookies();
 
   // Start the BullMQ worker
   try {

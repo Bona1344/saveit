@@ -1,6 +1,8 @@
 const { exec } = require('child_process');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { getCookiesPath } = require('../utils/cookies');
+const { getPlatform } = require('../utils/validator');
 
 function execPromise(command) {
   return new Promise((resolve, reject) => {
@@ -20,6 +22,12 @@ function getPlatformFlags(url) {
     '--no-check-certificates',
     '--user-agent', '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"',
   ];
+  // Add cookies for platforms that need them (Twitter/X, Threads)
+  const platform = getPlatform(url);
+  const cookiesPath = getCookiesPath(platform);
+  if (cookiesPath) {
+    flags.push('--cookies', `"${cookiesPath}"`);
+  }
   if (/tiktok\.com/i.test(url)) {
     flags.push('--extractor-args', '"tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com"');
   }

@@ -1,0 +1,11 @@
+﻿be9603d Add cookie support for Twitter/X and Threads downloads
+e7a1ace Support shortened TikTok URLs (vt.tiktok.com) with URL resolver
+bcb57c2 Install Python deps for yt-dlp extractors + improve platform flags
+c7a6c8c Add Twitter/X specific yt-dlp flags (graphql API + user-agent)
+df61e5b Use yt-dlp nightly builds for better Twitter/X support
+5112a2a Add missing Dockerfile and .dockerignore for Railway deployment
+22fac16 Fix railway.toml - remove dockerfilePath to avoid path conflict
+dd4af41 Add railway.toml to force Dockerfile builder
+748e41d Fix: add trust proxy for Railway reverse proxy
+6452651 Add .gitignore, remove node_modules and .env from repo
+f501de6 Initial commit: Set up project structure and ignored node_modules

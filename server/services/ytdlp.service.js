@@ -150,11 +150,11 @@ async function downloadMedia(url, formatId, quality, outputDir) {
   if (quality === 'audio-only' || formatId === 'audio-only') {
     formatArg = '-f bestaudio --extract-audio --audio-format mp3';
   } else if (!formatId || formatId === 'best') {
-    // Use single pre-merged file only — NO separate streams, NO FFmpeg merge
-    formatArg = '-f "b/best"';
+    // Use single pre-merged file — no separate streams, no FFmpeg merge
+    formatArg = '-f best';
   } else {
-    // Use the specific format directly (no merging)
-    formatArg = `-f "${formatId}/b/best"`;
+    // Use the specific format directly, fallback to best pre-merged
+    formatArg = `-f ${formatId}/best`;
   }
 
   const outputTemplate = path.join(outputDir, `${filename}.%(ext)s`);

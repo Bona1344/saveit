@@ -144,7 +144,8 @@ async function getInfo(url) {
 async function downloadMedia(url, formatId, quality, outputDir) {
   console.log('[yt-dlp] Starting download:', { url, formatId, quality });
 
-  const filename = `${uuidv4()}`;
+  const shortId = uuidv4().split('-')[0];
+  const filename = `saveit_${shortId}`;
   let formatArg = '';
 
   if (quality === 'audio-only' || formatId === 'audio-only') {

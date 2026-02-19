@@ -1,3 +1,6 @@
+const http = require('http');
+const https = require('https');
+
 const PLATFORM_PATTERNS = [
   {
     name: "youtube",
@@ -24,11 +27,15 @@ const PLATFORM_PATTERNS = [
     patterns: [
       /^(https?:\/\/)?(www\.)?tiktok\.com\//i,
       /^(https?:\/\/)?(vm\.)?tiktok\.com\//i,
+      /^(https?:\/\/)?(vt\.)?tiktok\.com\//i,
     ],
   },
   {
     name: "threads",
-    patterns: [/^(https?:\/\/)?(www\.)?threads\.net\//i],
+    patterns: [
+      /^(https?:\/\/)?(www\.)?threads\.net\//i,
+      /^(https?:\/\/)?(www\.)?threads\.com\//i,
+    ],
   },
 ];
 
@@ -71,4 +78,26 @@ function isSupportedPlatform(url) {
   return getPlatform(url) !== "unknown";
 }
 
-module.exports = { isValidUrl, getPlatform, isSupportedPlatform };
+function resolveUrl(url) {
+  const shortened = [/vt\.tiktok\.com/i, /vm\.tiktok\.com/i, /t\.co/i];
+  const isShort = shortened.some(p => p.test(url));
+  if (!isShort) return Promise.resolve(url);
+
+  console.log('[Resolver] Resolving:', url);
+  return new Promise((resolve) => {
+    const client = url.startsWith('https') ? https : http;
+    const req = client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        console.log('[Resolver] Resolved to:', res.headers.location);
+        resolve(res.headers.location);
+      } else {
+        resolve(url);
+      }
+      res.resume();
+    });
+    req.on('error', () => resolve(url));
+    req.setTimeout(5000, () => { req.destroy(); resolve(url); });
+  });
+}
+
+module.exports = { isValidUrl, getPlatform, isSupportedPlatform, resolveUrl };

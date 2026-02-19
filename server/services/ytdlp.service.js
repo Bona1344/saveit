@@ -4,9 +4,12 @@ const { v4: uuidv4 } = require('uuid');
 const { getCookiesPath } = require('../utils/cookies');
 const { getPlatform } = require('../utils/validator');
 
-function execPromise(command) {
+function execPromise(command, timeoutMs = 300000) {
   return new Promise((resolve, reject) => {
-    exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+    exec(command, { maxBuffer: 1024 * 1024 * 50, timeout: timeoutMs }, (error, stdout, stderr) => {
+      if (stderr) {
+        console.log('[yt-dlp] stderr:', stderr.slice(0, 500));
+      }
       if (error) {
         reject(new Error(stderr || error.message));
       } else {

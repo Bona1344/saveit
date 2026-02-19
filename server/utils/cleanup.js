@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 function cleanupTmpFiles(tmpDir) {

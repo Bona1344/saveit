@@ -24,7 +24,12 @@ function initCookies() {
 
   if (process.env.INSTAGRAM_COOKIES_BASE64) {
     try {
-      const decoded = Buffer.from(process.env.INSTAGRAM_COOKIES_BASE64, 'base64').toString('utf-8');
+      let decoded = Buffer.from(process.env.INSTAGRAM_COOKIES_BASE64, 'base64').toString('utf-8');
+      
+      // Duplicate cookies for .threads.net domain (since yt-dlp visits threads.net)
+      const threadsCookies = decoded.replace(/\.instagram\.com/g, '.threads.net');
+      decoded += '\n' + threadsCookies;
+
       fs.writeFileSync(INSTAGRAM_COOKIES_FILE, decoded);
       console.log('[Cookies] Instagram cookies loaded.');
     } catch (err) {

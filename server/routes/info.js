@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error('[Info] Error:', err.message);
     return res.status(500).json({
-      error: 'Failed to fetch media information. Please check the URL and try again.',
+      error: `Failed to fetch media information: ${err.message}`,
     });
   }
 });

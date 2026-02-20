@@ -141,6 +141,12 @@ app.get('/api/diag', async (req, res) => {
   results.node_version = process.version;
   results.tmp_dir = path.resolve(process.env.TMP_DIR || './tmp');
   results.tmp_exists = require('fs').existsSync(results.tmp_dir);
+  results.cookies = {
+    twitter_env: !!process.env.TWITTER_COOKIES_BASE64,
+    instagram_env: !!process.env.INSTAGRAM_COOKIES_BASE64,
+    twitter_file: require('fs').existsSync(require('path').join(results.tmp_dir, '../cookies/twitter.txt')),
+    instagram_file: require('fs').existsSync(require('path').join(results.tmp_dir, '../cookies/instagram.txt')),
+  };
   res.json(results);
 });
 

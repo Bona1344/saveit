@@ -112,6 +112,38 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Diagnostic endpoint — check yt-dlp status on Railway
+app.get('/api/diag', async (req, res) => {
+  const { exec } = require('child_process');
+  const results = {};
+  try {
+    const version = await new Promise((resolve, reject) => {
+      exec('yt-dlp --version', { timeout: 10000 }, (err, stdout, stderr) => {
+        if (err) reject(new Error(stderr || err.message));
+        else resolve(stdout.trim());
+      });
+    });
+    results.ytdlp_version = version;
+  } catch (e) {
+    results.ytdlp_error = e.message;
+  }
+  try {
+    const ffmpegV = await new Promise((resolve, reject) => {
+      exec('ffmpeg -version | head -1', { timeout: 5000 }, (err, stdout) => {
+        if (err) reject(err);
+        else resolve(stdout.trim());
+      });
+    });
+    results.ffmpeg = ffmpegV;
+  } catch (e) {
+    results.ffmpeg_error = e.message;
+  }
+  results.node_version = process.version;
+  results.tmp_dir = path.resolve(process.env.TMP_DIR || './tmp');
+  results.tmp_exists = require('fs').existsSync(results.tmp_dir);
+  res.json(results);
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('[Server] Unhandled error:', err.message);

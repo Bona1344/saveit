@@ -155,7 +155,7 @@ app.get('/api/test-threads', async (req, res) => {
   const path = require('path');
   const tmpDir = path.resolve(process.env.TMP_DIR || './tmp');
   const cookiesFile = path.join(tmpDir, '../cookies/instagram.txt');
-  const cmd = `yt-dlp --dump-json --no-playlist --cookies "${cookiesFile}" "https://www.threads.net/@therealtoriabrooke/post/DU6dJFCEWOO"`;
+  const cmd = `yt-dlp --dump-json --no-playlist "https://www.threads.net/@therealtoriabrooke/post/DU6dJFCEWOO"`;
   
   exec(cmd, { timeout: 60000 }, (error, stdout, stderr) => {
     res.json({

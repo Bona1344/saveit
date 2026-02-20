@@ -44,7 +44,7 @@ function getCookiesPath(platform) {
   if (platform === 'twitter' && fs.existsSync(TWITTER_COOKIES_FILE)) {
     return TWITTER_COOKIES_FILE;
   }
-  if ((platform === 'instagram' || platform === 'threads') && fs.existsSync(INSTAGRAM_COOKIES_FILE)) {
+  if (platform === 'instagram' && fs.existsSync(INSTAGRAM_COOKIES_FILE)) {
     return INSTAGRAM_COOKIES_FILE;
   }
   return null;

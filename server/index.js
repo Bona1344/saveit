@@ -150,6 +150,23 @@ app.get('/api/diag', async (req, res) => {
   res.json(results);
 });
 
+app.get('/api/test-threads', async (req, res) => {
+  const { exec } = require('child_process');
+  const path = require('path');
+  const tmpDir = path.resolve(process.env.TMP_DIR || './tmp');
+  const cookiesFile = path.join(tmpDir, '../cookies/instagram.txt');
+  const cmd = `yt-dlp --dump-json --no-playlist --cookies "${cookiesFile}" "https://www.threads.net/@therealtoriabrooke/post/DU6dJFCEWOO"`;
+  
+  exec(cmd, { timeout: 60000 }, (error, stdout, stderr) => {
+    res.json({
+      cmd,
+      error: error ? error.message : null,
+      stdout: stdout ? stdout.slice(0, 500) : null, // Limit output
+      stderr: stderr ? stderr : null
+    });
+  });
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('[Server] Unhandled error:', err.message);

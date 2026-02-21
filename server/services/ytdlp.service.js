@@ -48,10 +48,41 @@ function getSpeedFlags() {
   ].join(' ');
 }
 
+async function resolveThreadsUrl(url) {
+  if (!url.includes('threads.net') && !url.includes('threads.com')) return url;
+
+  console.log('[Threads] Resolving URL:', url);
+  return new Promise((resolve) => {
+    const { get } = require('https');
+    const options = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+      }
+    };
+
+    get(url, options, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        console.log('[Threads] Resolved to:', res.headers.location);
+        resolve(res.headers.location);
+      } else {
+        // If no redirect, just replace .com with .net as fallback
+        const fallback = url.replace('threads.com', 'threads.net');
+        console.log('[Threads] No redirect found, using fallback:', fallback);
+        resolve(fallback);
+      }
+    }).on('error', (err) => {
+      console.error('[Threads] Resolution error:', err.message);
+      resolve(url.replace('threads.com', 'threads.net'));
+    });
+  });
+}
+
 async function getInfo(url) {
-  // Fix for Threads: yt-dlp only supports threads.net, not threads.com
-  if (url.includes('threads.com')) {
-    url = url.replace('threads.com', 'threads.net');
+  // Fix for Threads: manually resolve redirect
+  if (url.includes('threads.com') || url.includes('threads.net')) {
+    url = await resolveThreadsUrl(url);
   }
 
   console.log('[yt-dlp] Fetching info for:', url);

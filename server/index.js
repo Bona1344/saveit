@@ -155,13 +155,12 @@ app.get('/api/test-threads', async (req, res) => {
   const path = require('path');
   const tmpDir = path.resolve(process.env.TMP_DIR || './tmp');
   const cookiesFile = path.join(tmpDir, '../cookies/instagram.txt');
-  const cmd = `yt-dlp --dump-json --no-playlist --cookies "${cookiesFile}" "threads:https://www.threads.net/@therealtoriabrooke/post/DU6dJFCEWOO"`;
+  const cmd = `python3 -c "import yt_dlp, os, subprocess; path = os.path.dirname(yt_dlp.__file__); print(subprocess.check_output(['grep', '-rnw', path, '-e', 'threads\\\\.net']).decode('utf-8'))"`;
   
   exec(cmd, { timeout: 60000 }, (error, stdout, stderr) => {
     res.json({
-      cmd,
+      stdout: stdout ? stdout.trim() : '',
       error: error ? error.message : null,
-      stdout: stdout ? stdout.slice(0, 500) : null, // Limit output
       stderr: stderr ? stderr : null
     });
   });

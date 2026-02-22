@@ -150,22 +150,6 @@ app.get('/api/diag', async (req, res) => {
   res.json(results);
 });
 
-app.get('/api/test-threads', async (req, res) => {
-  const { exec } = require('child_process');
-  const path = require('path');
-  const tmpDir = path.resolve(process.env.TMP_DIR || './tmp');
-  const cookiesFile = path.join(tmpDir, '../cookies/instagram.txt');
-  const cmd = `python3 -c "import yt_dlp, os, subprocess; path = os.path.dirname(yt_dlp.__file__); print(subprocess.check_output(['grep', '-rnw', path, '-e', 'threads\\\\.net']).decode('utf-8'))"`;
-  
-  exec(cmd, { timeout: 60000 }, (error, stdout, stderr) => {
-    res.json({
-      stdout: stdout ? stdout.trim() : '',
-      error: error ? error.message : null,
-      stderr: stderr ? stderr : null
-    });
-  });
-});
-
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('[Server] Unhandled error:', err.message);

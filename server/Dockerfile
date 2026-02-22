@@ -12,8 +12,9 @@ RUN apt-get update && \
 # certifi: SSL certificates
 RUN pip3 install --break-system-packages websockets requests brotli certifi mutagen pycryptodomex
 
-# Install yt-dlp from master branch for latest fixes
-RUN pip3 install --break-system-packages git+https://github.com/yt-dlp/yt-dlp.git@master
+# Install yt-dlp (nightly for latest site fixes including Twitter/X)
+RUN curl -L https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
+    chmod a+rx /usr/local/bin/yt-dlp
 
 # Verify yt-dlp installation
 RUN yt-dlp --version

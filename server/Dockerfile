@@ -1,8 +1,8 @@
 FROM node:20-slim
 
-# Install Python, pip, FFmpeg, and other dependencies
+# Install Python, pip, FFmpeg, git, and other dependencies
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip ffmpeg curl ca-certificates && \
+    apt-get install -y python3 python3-pip ffmpeg curl ca-certificates git && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies needed by yt-dlp extractors

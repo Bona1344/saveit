@@ -12,7 +12,6 @@ import {
   Instagram,
 } from 'lucide-react';
 import Link from 'next/link';
-import Script from 'next/script';
 
 export default function AboutPage() {
   return (
@@ -150,17 +149,6 @@ export default function AboutPage() {
                 </span>
               </li>
             </ol>
-          </section>
-
-          {/* Native Banner Ad */}
-          <section className="mb-14">
-            <div id="container-984d3f8515ec11bd4cb55312a7bcf113"></div>
-            <Script
-              async
-              data-cfasync="false"
-              src="https://pl28784046.effectivegatecpm.com/984d3f8515ec11bd4cb55312a7bcf113/invoke.js"
-              strategy="lazyOnload"
-            />
           </section>
 
           {/* Tech Stack */}

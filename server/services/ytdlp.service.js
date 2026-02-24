@@ -27,11 +27,15 @@ function getPlatformFlags(url) {
     '--geo-bypass',
     '--user-agent', '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"',
   ];
-  // Add cookies for platforms that need them (Twitter/X, Threads, Instagram)
+  // Add cookies for platforms that need them
   const platform = getPlatform(url);
   const cookiesPath = getCookiesPath(platform);
   if (cookiesPath) {
     flags.push('--cookies', `"${cookiesPath}"`);
+  }
+  // YouTube: use nodejs runtime for NSIG decryption, and web player client
+  if (/youtu(be\.com|\.be)/i.test(url)) {
+    flags.push('--extractor-args', '"youtube:player_client=web"');
   }
   if (/tiktok\.com/i.test(url)) {
     flags.push('--extractor-args', '"tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com"');

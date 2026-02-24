@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import Script from 'next/script';
 import './globals.css';
 
 const inter = Inter({
@@ -48,6 +49,12 @@ export default function RootLayout({ children }) {
               },
             },
           }}
+        />
+
+        {/* Adsterra Social Bar — loads on every page */}
+        <Script
+          src="https://pl28784034.effectivegatecpm.com/9d/79/31/9d7931633d5e7e6deaec3339ea5da9f0.js"
+          strategy="afterInteractive"
         />
       </body>
     </html>

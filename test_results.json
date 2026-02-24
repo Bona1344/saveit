@@ -7,7 +7,7 @@
   {
     "url": "https://www.tiktok.com/@mrbeast/video/7328966953046543662",
     "status": 500,
-    "body": "{\"error\":\"Failed to fetch media information: Failed to fetch media info: WARNING: [TikTok] The extractor is attempting impersonation, but no impersonate target is available. If you encounter errors, then see  https://github.com/yt-dlp/yt-dlp#impersonation  for information on installing the required dependencies\\nERROR: [TikTok] 7328966953046543662: Your IP address is blocked from accessing this post\\n\"}"
+    "body": "{\"error\":\"Failed to fetch media information: Failed to fetch media info: ERROR: [TikTok] 7328966953046543662: Your IP address is blocked from accessing this post\\n\"}"
   },
   {
     "url": "https://www.instagram.com/reel/C21w0vDuvmS/",

@@ -1,5 +1,7 @@
 const path = require('path');
 const { downloadMedia } = require('./ytdlp.service');
+const { downloadThreadsMedia } = require('./threads.service');
+const { getPlatform } = require('../utils/validator');
 const { v4: uuidv4 } = require('uuid');
 
 // In-memory job store (no Redis needed)
@@ -32,7 +34,12 @@ async function addDownloadJob(url, formatId, quality) {
       if (job) job.progress = 30;
 
       console.log(`[Queue] Processing job ${jobId}...`);
-      const outputFile = await downloadMedia(url, formatId, quality, tmpDir);
+
+      // Use custom service for Threads, yt-dlp for everything else
+      const platform = getPlatform(url);
+      const outputFile = platform === 'threads'
+        ? await downloadThreadsMedia(url, formatId, quality, tmpDir)
+        : await downloadMedia(url, formatId, quality, tmpDir);
 
       const updatedJob = jobs.get(jobId);
       if (updatedJob) {

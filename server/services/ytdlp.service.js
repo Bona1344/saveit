@@ -51,11 +51,6 @@ function getSpeedFlags() {
 }
 
 async function getInfo(url) {
-  // Fix for Threads: yt-dlp only supports threads.net, not threads.com
-  if (url.includes('threads.com')) {
-    url = url.replace('threads.com', 'threads.net');
-  }
-
   console.log('[yt-dlp] Fetching info for:', url);
 
   try {
@@ -149,11 +144,6 @@ async function getInfo(url) {
 }
 
 async function downloadMedia(url, formatId, quality, outputDir) {
-  // Fix for Threads: yt-dlp only supports threads.net, not threads.com
-  if (url.includes('threads.com')) {
-    url = url.replace('threads.com', 'threads.net');
-  }
-
   console.log('[yt-dlp] Starting download:', { url, formatId, quality });
 
   const shortId = uuidv4().split('-')[0];

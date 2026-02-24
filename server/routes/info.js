@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { isValidUrl, getPlatform, isSupportedPlatform } = require('../utils/validator');
 const { getInfo } = require('../services/ytdlp.service');
+const { getThreadsInfo } = require('../services/threads.service');
 
 router.post('/', async (req, res) => {
   try {
@@ -25,7 +26,8 @@ router.post('/', async (req, res) => {
     const platform = getPlatform(url);
     console.log('[Info] Detected platform:', platform);
 
-    const info = await getInfo(url);
+    // Use custom service for Threads, yt-dlp for everything else
+    const info = platform === 'threads' ? await getThreadsInfo(url) : await getInfo(url);
 
     console.log('[Info] Successfully fetched info:', info.title);
 

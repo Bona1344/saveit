@@ -12,6 +12,9 @@ export const metadata = {
   description:
     'Download videos and images from YouTube, Twitter/X, Instagram, TikTok, and Threads. Preview media info, choose quality, and download instantly.',
   keywords: ['video downloader', 'youtube downloader', 'tiktok download', 'instagram download', 'twitter video'],
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({ children }) {

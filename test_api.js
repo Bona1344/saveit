@@ -3,8 +3,7 @@ const fs = require('fs');
 
 const urls = [
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  'https://www.tiktok.com/@mrbeast/video/7328966953046543662',
-  'https://www.instagram.com/reel/C21w0vDuvmS/',
+  'https://www.threads.com/@therealtoriabrooke/post/DU6dJFCEWOO',
 ];
 
 async function testUrl(url) {
@@ -31,7 +30,8 @@ async function testUrl(url) {
   for (const url of urls) {
     const r = await testUrl(url);
     results.push(r);
+    console.log(`${r.status === 200 ? '✓' : '✗'} ${url} -> ${r.status}`);
   }
   fs.writeFileSync('test_results.json', JSON.stringify(results, null, 2));
-  console.log('Done - see test_results.json');
+  console.log('\nDone - see test_results.json');
 })();

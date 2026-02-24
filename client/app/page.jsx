@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
+import NativeBannerAd from '@/components/NativeBannerAd';
 import toast from 'react-hot-toast';
 import {
   Youtube,
@@ -155,17 +155,8 @@ export default function HomePage() {
               icon={<ArrowDown className="w-6 h-6" />}
             />
           </div>
-        </section>
 
-        {/* Native Banner Ad */}
-        <section className="max-w-4xl mx-auto py-8">
-          <div id="container-984d3f8515ec11bd4cb55312a7bcf113"></div>
-          <Script
-            async
-            data-cfasync="false"
-            src="https://pl28784046.effectivegatecpm.com/984d3f8515ec11bd4cb55312a7bcf113/invoke.js"
-            strategy="afterInteractive"
-          />
+          <NativeBannerAd />
         </section>
       </main>
 

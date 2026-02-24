@@ -4,6 +4,7 @@ const path = require('path');
 const COOKIES_DIR = path.join(__dirname, '..', 'cookies');
 const TWITTER_COOKIES_FILE = path.join(COOKIES_DIR, 'twitter.txt');
 const INSTAGRAM_COOKIES_FILE = path.join(COOKIES_DIR, 'instagram.txt');
+const YOUTUBE_COOKIES_FILE = path.join(COOKIES_DIR, 'youtube.txt');
 
 function initCookies() {
   if (!fs.existsSync(COOKIES_DIR)) {
@@ -38,6 +39,18 @@ function initCookies() {
   } else {
     console.log('[Cookies] No Instagram cookies configured.');
   }
+
+  if (process.env.YOUTUBE_COOKIES_BASE64) {
+    try {
+      const decoded = Buffer.from(process.env.YOUTUBE_COOKIES_BASE64, 'base64').toString('utf-8');
+      fs.writeFileSync(YOUTUBE_COOKIES_FILE, decoded);
+      console.log('[Cookies] YouTube cookies loaded.');
+    } catch (err) {
+      console.error('[Cookies] Failed to decode YouTube cookies:', err.message);
+    }
+  } else {
+    console.log('[Cookies] No YouTube cookies configured.');
+  }
 }
 
 function getCookiesPath(platform) {
@@ -47,7 +60,11 @@ function getCookiesPath(platform) {
   if ((platform === 'instagram' || platform === 'threads') && fs.existsSync(INSTAGRAM_COOKIES_FILE)) {
     return INSTAGRAM_COOKIES_FILE;
   }
+  if (platform === 'youtube' && fs.existsSync(YOUTUBE_COOKIES_FILE)) {
+    return YOUTUBE_COOKIES_FILE;
+  }
   return null;
 }
 
 module.exports = { initCookies, getCookiesPath };
+

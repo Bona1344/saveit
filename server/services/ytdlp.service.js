@@ -24,9 +24,10 @@ function execPromise(command, timeoutMs = 300000) {
 function getPlatformFlags(url) {
   const flags = [
     '--no-check-certificates',
+    '--geo-bypass',
     '--user-agent', '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"',
   ];
-  // Add cookies for platforms that need them (Twitter/X, Threads)
+  // Add cookies for platforms that need them (Twitter/X, Threads, Instagram)
   const platform = getPlatform(url);
   const cookiesPath = getCookiesPath(platform);
   if (cookiesPath) {
@@ -34,6 +35,7 @@ function getPlatformFlags(url) {
   }
   if (/tiktok\.com/i.test(url)) {
     flags.push('--extractor-args', '"tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com"');
+    flags.push('--impersonate', 'chrome');
   }
   return flags.join(' ');
 }

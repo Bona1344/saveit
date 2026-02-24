@@ -10,7 +10,7 @@ RUN apt-get update && \
 # requests: required for various extractors
 # brotli: better compression support
 # certifi: SSL certificates
-RUN pip3 install --break-system-packages websockets requests brotli certifi mutagen pycryptodomex
+RUN pip3 install --break-system-packages websockets requests brotli certifi mutagen pycryptodomex curl_cffi
 
 # Install yt-dlp (nightly for latest site fixes including Twitter/X)
 RUN curl -L https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \

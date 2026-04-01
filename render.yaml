@@ -2,8 +2,7 @@ services:
   - type: web
     name: saveit-backend
     runtime: docker
-    dockerfilePath: ./server/Dockerfile
-    dockerContext: ./server
+    dockerfilePath: ./Dockerfile
     plan: free
     envVars:
       - key: NODE_ENV
